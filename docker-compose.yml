@@ -1,0 +1,47 @@
+version: '3.3'
+services:
+
+  postgres:
+    image: postgres:latest
+    environment:
+      - POSTGRES_DB=cardealer
+      - POSTGRES_USER=cardealer
+      - POSTGRES_PASSWORD=1234
+
+  redis:
+    image: redis:latest
+
+  django:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./autoshop/:/app/
+    depends_on:
+      - redis
+      - postgres
+    links:
+      - postgres
+      - redis
+    environment:
+      - DJANGO_DEBUG=False
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=postgres
+    command: |
+      python manage.py runserver 0.0.0.0:8000
+  worker:
+    build: .
+    volumes:
+      - ./autoshop/:/app/
+    depends_on:
+      - redis
+      - postgres
+    links:
+      - postgres
+      - redis
+    environment:
+      - DJANGO_DEBUG=False
+      - REDIS_HOST=redis
+      - POSTGRES_HOST=postgres
+    command: |
+      python manage.py rqworker default
