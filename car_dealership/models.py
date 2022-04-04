@@ -1,8 +1,8 @@
 from django.db import models
 from django_countries.fields import CountryField
 
-from core.abstract_models import AbstractDefaultModels
-from core.enums import Currency, StatusOfCar
+from core.abstract_models import AbstractDefaultModels, Raiting
+from core.enums.car_dealership_enums import Currency, StatusOfCar
 from purchaser.models import Purchaser
 
 
@@ -11,10 +11,11 @@ class Car(AbstractDefaultModels):
     content = models.TextField(blank=True)
     year = models.IntegerField(null=True)
     price = models.IntegerField(default=12000)
-    currency = models.CharField(max_length=3,
-                                choices=Currency.choices,
-                                default=Currency.USD
-                                )
+    currency = models.CharField(
+        max_length=3,
+        choices=Currency.choices,
+        default=Currency.USD
+    )
 
     cat = models.ForeignKey('Category',
                             on_delete=models.PROTECT,
@@ -25,8 +26,14 @@ class Car(AbstractDefaultModels):
                               default=StatusOfCar.Available
                               )
 
-    def __str__(self):
-        return self.title
+    class Meta:
+        ordering = ['title']
+        verbose_name = 'Машина'
+        verbose_name_plural = 'Машины'
+
+
+def __str__(self):
+    return self.title
 
 
 class Category(models.Model):
@@ -51,29 +58,56 @@ class Rewiew(AbstractDefaultModels):
         on_delete=models.PROTECT, null=True
     )
 
+    class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
+
     def __str__(self):
         return self.name
 
 
-class Raiting(models.Model):
-    value = models.IntegerField(help_text='Рейтинг выставляется от 1 до 10')
-    car = models.ForeignKey('car_dealership.Car', on_delete=models.CASCADE)
+class Raiting(AbstractDefaultModels, Raiting):
+    car = models.ForeignKey(
+
+        'car_dealership.Car',
+        on_delete=models.CASCADE,
+        related_name='carraiting'
+    )
 
     def __str__(self):
         return str(self.car)
+
+    class Meta:
+        verbose_name = 'Рейтинг'
+        verbose_name_plural = 'Рейтинги'
 
 
 class Car_dealership(AbstractDefaultModels):
     name = models.CharField(max_length=255)
     characteristic = models.TextField(blank=True)
     location = CountryField(null=True)
-    contact = models.EmailField()
-    supplier = models.ManyToManyField(
-        'supplier.Supplier',
-        related_name='supplier_cardealer',
+    city = models.CharField(max_length=255, null=True)
+    adress = models.CharField(
+
+        help_text='Улица с номером дома',
+        max_length=255,
         null=True
     )
-    car = models.ManyToManyField('car_dealership.Car')
+    contact = models.EmailField()
+    cars = models.ManyToManyField(
+        Car,
+        through='car_dealership.Car_m2m_Dealer',
+    )
+
+    class Meta:
+        verbose_name = 'Aвтосалон'
+        verbose_name_plural = 'Aвтосалоны'
 
     def __str__(self):
         return str(self.name)
+
+
+class Car_m2m_Dealer(models.Model):
+    car = models.ForeignKey(Car, on_delete=models.PROTECT, default='')
+    autoshop = models.ForeignKey(Car_dealership, on_delete=models.PROTECT, default='')
+    date_joined = models.DateField(auto_now_add=True, null=True)

@@ -1,7 +1,7 @@
 from django.db import models
 
 from core.abstract_models import AbstractDefaultModels
-from core.enums import SexOfPurchaser
+from core.enums.purchaser_enums import SexOfPurchaser
 from core.validators import check_phonenum
 
 
@@ -13,6 +13,7 @@ class Purchaser(AbstractDefaultModels):
         max_length=6,
         choices=SexOfPurchaser.choices,
         default=SexOfPurchaser.Male
+
     )
     age = models.IntegerField()
     birth = models.DateField(null=True)

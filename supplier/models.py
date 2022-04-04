@@ -2,7 +2,7 @@ from django.db import models
 from django_countries.fields import CountryField
 
 from core.abstract_models import AbstractDefaultModels
-from core.validators import check_year_of_foundation
+from core.validators import check_year_of_foundation, check_raiting
 
 
 class Supplier(AbstractDefaultModels):
@@ -26,8 +26,8 @@ class Supplier(AbstractDefaultModels):
         return self.name
 
 
-class Raiting(models.Model):
-    value = models.IntegerField(help_text='Рейтинг выставляется от 1 до 10')
+class Raiting(AbstractDefaultModels):
+    value = models.IntegerField(validators=[check_raiting], default=9)
     supplier = models.ForeignKey(
         'Supplier',
         on_delete=models.CASCADE

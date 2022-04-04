@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Car, Raiting, Rewiew, Car_dealership
+from .models import Car, Raiting, Rewiew, Car_dealership, Car_m2m_Dealer
 
 
 class CarAdmin(admin.ModelAdmin):
@@ -22,6 +22,7 @@ class RaitingAdmin(admin.ModelAdmin):
 class Car_dealershipAdmin(admin.ModelAdmin):
     search_fields = ['characteristic']
     ordering = ['-name']
+    list_display = ['name', 'location', 'contact', 'is_published']
 
 
 class RewiewAdmin(admin.ModelAdmin):
@@ -33,3 +34,4 @@ admin.site.register(Car, CarAdmin)
 admin.site.register(Raiting, RaitingAdmin)
 admin.site.register(Rewiew, RewiewAdmin)
 admin.site.register(Car_dealership, Car_dealershipAdmin)
+
