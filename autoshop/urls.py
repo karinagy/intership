@@ -18,17 +18,12 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import routers
-
-from car_dealership.api.v1.view.view1 import *
-
-router = routers.SimpleRouter()
-router.register(r'cars', CarViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/v1/', include(router.urls)),
-
+    path('', include('car_dealership.urls')),
+    path('', include('supplier.urls')),
+    path('', include('purchaser.urls')),
 ]
 
 if settings.DEBUG:

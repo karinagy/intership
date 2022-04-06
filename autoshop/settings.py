@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'debug_toolbar',
     'rest_framework',
     'django_filters',
+    'rest_framework_swagger',
 
     'car_dealership.apps.CarDealershipConfig',
     'supplier.apps.SupplierConfig',

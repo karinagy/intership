@@ -1,7 +1,5 @@
 from django.db import models
 
-from core.validators import check_raiting
-
 
 class AbstractDefaultModels(models.Model):
     time_create = models.DateTimeField(auto_now_add=True, null=True)
@@ -10,10 +8,6 @@ class AbstractDefaultModels(models.Model):
 
     class Meta:
         abstract = True
-
-
-class Raiting(models.Model):
-    value = models.IntegerField(validators=[check_raiting], default=1)
 
 
 """

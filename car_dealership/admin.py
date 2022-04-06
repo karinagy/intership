@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Car, Raiting, Rewiew, Car_dealership, Car_m2m_Dealer
+from .models import Car, Raiting, Rewiew, Car_dealership, Car_m2m_Dealer, Category
 
 
 class CarAdmin(admin.ModelAdmin):
@@ -34,4 +34,5 @@ admin.site.register(Car, CarAdmin)
 admin.site.register(Raiting, RaitingAdmin)
 admin.site.register(Rewiew, RewiewAdmin)
 admin.site.register(Car_dealership, Car_dealershipAdmin)
+
 

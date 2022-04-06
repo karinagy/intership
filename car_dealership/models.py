@@ -1,8 +1,9 @@
 from django.db import models
 from django_countries.fields import CountryField
 
-from core.abstract_models import AbstractDefaultModels, Raiting
+from core.abstract_models import AbstractDefaultModels
 from core.enums.car_dealership_enums import Currency, StatusOfCar
+from core.validators import check_raiting
 from purchaser.models import Purchaser
 
 
@@ -26,14 +27,19 @@ class Car(AbstractDefaultModels):
                               default=StatusOfCar.Available
                               )
 
+    # user = models.ForeignKey(
+    # User,
+    # verbose_name='Пользователь',
+    # on_delete=models.CASCADE
+    # )
+
     class Meta:
         ordering = ['title']
         verbose_name = 'Машина'
         verbose_name_plural = 'Машины'
 
-
-def __str__(self):
-    return self.title
+    def __str__(self):
+        return self.title
 
 
 class Category(models.Model):
@@ -48,7 +54,7 @@ class Rewiew(AbstractDefaultModels):
     name = models.CharField(max_length=255)
     text = models.TextField(max_length=255)
     car = models.ForeignKey(
-        'car_dealership.Car',
+        Car,
         related_name='car_rewiew',
         on_delete=models.CASCADE
     )
@@ -66,12 +72,13 @@ class Rewiew(AbstractDefaultModels):
         return self.name
 
 
-class Raiting(AbstractDefaultModels, Raiting):
+class Raiting(AbstractDefaultModels):
+    value = models.IntegerField(validators=[check_raiting], default=1)
     car = models.ForeignKey(
 
-        'car_dealership.Car',
+        Car,
         on_delete=models.CASCADE,
-        related_name='carraiting'
+
     )
 
     def __str__(self):
@@ -79,7 +86,7 @@ class Raiting(AbstractDefaultModels, Raiting):
 
     class Meta:
         verbose_name = 'Рейтинг'
-        verbose_name_plural = 'Рейтинги'
+        verbose_name_plural = 'Рейтинга'
 
 
 class Car_dealership(AbstractDefaultModels):
