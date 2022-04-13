@@ -25,6 +25,11 @@ class Supplier(AbstractDefaultModels):
     def __str__(self):
         return self.name
 
+    class Meta:
+        ordering = ['name']
+        verbose_name = 'Поставщик'
+        verbose_name_plural = 'Поставщики'
+
 
 class Raiting(AbstractDefaultModels):
     value = models.IntegerField(validators=[check_raiting], default=9)
@@ -36,6 +41,11 @@ class Raiting(AbstractDefaultModels):
     def __str__(self):
         return str(self.supplier)
 
+    class Meta:
+        ordering = ['value']
+        verbose_name = 'Рейтинг'
+        verbose_name_plural = 'Рейтинги'
+
 
 class Founder(AbstractDefaultModels):
     first_name = models.CharField(max_length=255, null=True)
@@ -45,3 +55,8 @@ class Founder(AbstractDefaultModels):
 
     def __str__(self):
         return self.first_name
+
+    class Meta:
+        ordering = ['first_name']
+        verbose_name = 'Основатель'
+        verbose_name_plural = 'Основатели'

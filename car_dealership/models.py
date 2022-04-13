@@ -1,13 +1,13 @@
 from django.db import models
 from django_countries.fields import CountryField
 
-from core.abstract_models import AbstractDefaultModels
-from core.enums.car_dealership_enums import Currency, StatusOfCar
+from core.abstract_models import AbstractDefaultModels, AbstractDelete
+from core.enums.car_dealership_enums import Currency, StatusOfCar, Sale
 from core.validators import check_raiting
 from purchaser.models import Purchaser
 
 
-class Car(AbstractDefaultModels):
+class Car(AbstractDefaultModels, AbstractDelete):
     title = models.CharField(max_length=255)
     content = models.TextField(blank=True)
     year = models.IntegerField(null=True)
@@ -18,20 +18,16 @@ class Car(AbstractDefaultModels):
         default=Currency.USD
     )
 
-    cat = models.ForeignKey('Category',
-                            on_delete=models.PROTECT,
-                            null=True
-                            )
-    status = models.CharField(max_length=255,
-                              choices=StatusOfCar.choices,
-                              default=StatusOfCar.Available
-                              )
-
-    # user = models.ForeignKey(
-    # User,
-    # verbose_name='Пользователь',
-    # on_delete=models.CASCADE
-    # )
+    cat = models.ForeignKey(
+        'Category',
+        on_delete=models.PROTECT,
+        null=True
+    )
+    status = models.CharField(
+        max_length=255,
+        choices=StatusOfCar.choices,
+        default=StatusOfCar.Available
+    )
 
     class Meta:
         ordering = ['title']
@@ -49,13 +45,14 @@ class Category(models.Model):
         return self.name
 
 
-class Rewiew(AbstractDefaultModels):
+class Review(AbstractDefaultModels, AbstractDelete):
     email = models.EmailField()
     name = models.CharField(max_length=255)
     text = models.TextField(max_length=255)
     car = models.ForeignKey(
         Car,
-        related_name='car_rewiew',
+        verbose_name='машину',
+        related_name='reviews',
         on_delete=models.CASCADE
     )
     purchaser = models.ForeignKey(
@@ -72,12 +69,14 @@ class Rewiew(AbstractDefaultModels):
         return self.name
 
 
-class Raiting(AbstractDefaultModels):
+class Raiting(AbstractDefaultModels, AbstractDelete):
     value = models.IntegerField(validators=[check_raiting], default=1)
     car = models.ForeignKey(
 
         Car,
         on_delete=models.CASCADE,
+        verbose_name='рейтинг',
+        related_name='raiting'
 
     )
 
@@ -86,10 +85,10 @@ class Raiting(AbstractDefaultModels):
 
     class Meta:
         verbose_name = 'Рейтинг'
-        verbose_name_plural = 'Рейтинга'
+        verbose_name_plural = 'Рейтинги'
 
 
-class Car_dealership(AbstractDefaultModels):
+class Car_dealership(AbstractDefaultModels, AbstractDelete):
     name = models.CharField(max_length=255)
     characteristic = models.TextField(blank=True)
     location = CountryField(null=True)
@@ -118,3 +117,68 @@ class Car_m2m_Dealer(models.Model):
     car = models.ForeignKey(Car, on_delete=models.PROTECT, default='')
     autoshop = models.ForeignKey(Car_dealership, on_delete=models.PROTECT, default='')
     date_joined = models.DateField(auto_now_add=True, null=True)
+
+    class Meta:
+        verbose_name = 'Список автомобилей автосалона'
+        verbose_name_plural = 'Список автомобилей автосалонoв'
+
+    def __str__(self):
+        return str(self.car)
+
+
+class Car_dealershipSelling(AbstractDefaultModels, AbstractDelete):
+    dealership = models.ForeignKey(Car_dealership, on_delete=models.CASCADE)
+    car = models.ForeignKey(Car, on_delete=models.CASCADE)
+    price = models.IntegerField()
+    currency = models.CharField(
+        max_length=3,
+        choices=Currency.choices,
+        default=Currency.USD
+    )
+    sale = models.CharField(
+        max_length=255,
+        choices=Sale.choices,
+        default=Sale.No_sale
+    )
+
+    class Meta:
+        verbose_name = 'Продажа авто'
+        verbose_name_plural = 'Продажа авто'
+
+    def __str__(self):
+        return str(self.car)
+
+
+class Car_dealershipSeasonsales(AbstractDefaultModels, AbstractDelete):
+    name_of_sale = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    car = models.ForeignKey(
+        Car,
+        on_delete=models.CASCADE,
+    )
+    car_dealership = models.ForeignKey(
+        Car_dealership,
+        on_delete=models.CASCADE
+    )
+    first_price = models.IntegerField()
+    now_price = models.IntegerField()
+    currency = models.CharField(
+        max_length=3,
+        choices=Currency.choices,
+        default=Currency.USD
+    )
+    sale = models.CharField(
+        max_length=255,
+        choices=Sale.choices,
+        default=Sale.No_sale
+    )
+    location_of_dealership = CountryField()
+    start_time = models.DateField()
+    end_time = models.DateField()
+
+    class Meta:
+        verbose_name = 'Сезонная скидка'
+        verbose_name_plural = 'Сезонные скидки'
+
+    def __str__(self):
+        return str(self.car)

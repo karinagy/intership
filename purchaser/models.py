@@ -27,3 +27,24 @@ class Purchaser(AbstractDefaultModels):
 
     def __str__(self):
         return self.first_name
+
+    class Meta:
+        ordering = ['first_name']
+        verbose_name = 'Покупатель'
+        verbose_name_plural = 'Покупатели'
+
+
+class Balance(models.Model):
+    value = models.IntegerField()
+    purchaser = models.ForeignKey(
+        Purchaser,
+        on_delete=models.CASCADE
+    )
+
+    def __str__(self):
+        return str(self.purchaser)
+
+    class Meta:
+        ordering = ['value']
+        verbose_name = 'Баланс'
+        verbose_name_plural = 'Балансы'

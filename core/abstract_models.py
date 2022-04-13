@@ -10,17 +10,15 @@ class AbstractDefaultModels(models.Model):
         abstract = True
 
 
-"""
 class AbstractDelete(models.Model):
     is_published = models.BooleanField(default=True)
 
-    def Delete(self, *args, **kwargs):
+    def delete(self, *args, **kwargs):
         self.is_published = False
         self.save(update_fields=('is_published',))
 
-    def Alldelet(self):
+    def alldelete(self):
         super(AbstractDelete, self).delete()
 
     class Meta:
         abstract = True
-"""

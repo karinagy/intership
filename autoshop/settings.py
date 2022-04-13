@@ -11,7 +11,10 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 from pathlib import Path
+from celery import Celery
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -44,10 +47,14 @@ INSTALLED_APPS = [
     'rest_framework',
     'django_filters',
     'rest_framework_swagger',
+    'rest_framework_simplejwt',
+    'rest_framework.authtoken',
+    'djoser',
 
     'car_dealership.apps.CarDealershipConfig',
     'supplier.apps.SupplierConfig',
     'purchaser.apps.PurchaserConfig',
+    'user',
     'core'
 
 ]
@@ -100,6 +107,8 @@ DATABASES = {
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
+AUTH_USER_MODEL = 'user.User'
+AUTHENTICATION_BACKENDS = ('user.backends.AuthBackend',)
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -144,8 +153,41 @@ INTERNAL_IPS = [
 ]
 
 REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAdminUser',
+        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+        'rest_framework.permissions.IsAuthenticated',
+    ],
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
-    )
+    ),
+
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
 
 }
+
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
+    'BLACKLIST_AFTER_ROTATION': False,
+}
+
+# DJOSER
+DJOSER = {
+    'USER_CREATE_PASSWORD_RETYPE': True,
+    'SEND_ACTIVATION_EMAIL': True,
+    'SET_PASSWORD_RETYPE': True,
+    'PASSWORD_RESET_CONFIRM_RETYPE': True,
+    'TOKEN_MODEL': None,
+    'ACTIVATION_URL': 'auth/verify/{uid}/{token}/',
+}
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'karina6918538@gmail.com'
+EMAIL_HOST_PASSWORD = '#'
+EMAIL_PORT = 465
