@@ -3,10 +3,10 @@ services:
 
   postgres:
     image: postgres:latest
-    environment:
-      - POSTGRES_DB=autoshop
-      - POSTGRES_USER=auto
-      - POSTGRES_PASSWORD=1234
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    env_file:
+      - db.env
 
   redis:
     image: redis:latest
@@ -29,19 +29,3 @@ services:
       - POSTGRES_HOST=postgres
     command: |
       python manage.py runserver 0.0.0.0:8000
-  worker:
-    build: .
-    volumes:
-      - ./autoshop/:/app/
-    depends_on:
-      - redis
-      - postgres
-    links:
-      - postgres
-      - redis
-    environment:
-      - DJANGO_DEBUG=False
-      - REDIS_HOST=redis
-      - POSTGRES_HOST=postgres
-    command: |
-      python manage.py rqworker default
